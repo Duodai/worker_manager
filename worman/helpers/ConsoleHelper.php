@@ -24,14 +24,27 @@ class ConsoleHelper
     {
         // daemonize (unbind from console)
         $pid = pcntl_fork();
-        self::msg('process ' . $pid . ' unbound');
         if ($pid === -1) {
             throw new LauncherException(__METHOD__ . ' error: process forking failed');
         } elseif ($pid !== 0) {
+            self::msg('process ' . $pid . ' unbound');
             exit;
         } else {
+            self::redirectOutput();
             $daemon->start();
         }
+    }
+
+    protected static function redirectOutput() {
+        global $STDIN;
+        global $STDOUT;
+        global $STDERR;
+        fclose(STDIN);
+        fclose(STDOUT);
+        fclose(STDERR);
+        $STDIN = fopen('/dev/null', 'r');
+        $STDOUT = fopen(\Yii::getAlias('@runtime').'/logs/application.log', 'wb');
+        $STDERR = fopen(\Yii::getAlias('@runtime').'/logs/error.log', 'wb');
     }
 
 }
