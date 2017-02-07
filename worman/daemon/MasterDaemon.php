@@ -2,15 +2,17 @@
 
 namespace app\worman\daemon;
 
-use app\worman\helpers\DbgHelper;
+use app\worman\exceptions\LauncherException;
+use app\worman\helpers\ConsoleHelper;
 
 class MasterDaemon
 {
 
     public function start()
     {
-        DbgHelper::msg('Master daemon started');
+        ConsoleHelper::msg('Master daemon started');
         sleep(1);
+        throw new LauncherException('test');
     }
 
 }
