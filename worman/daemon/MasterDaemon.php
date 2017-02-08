@@ -12,7 +12,7 @@ class MasterDaemon
     {
         ConsoleHelper::msg('Master daemon started');
         sleep(1);
-        throw new LauncherException('test');
+
     }
 
 }
