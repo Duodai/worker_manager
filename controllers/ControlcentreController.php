@@ -3,14 +3,13 @@
 
 namespace app\controllers;
 
-
-use yii\web\Controller;
+use yii\base\Controller;
 
 class ControlcentreController extends Controller {
 
     public function actionIndex() {
-        echo 'Ok';
-        exit;
+
+        echo '<pre>'; var_dump(\Yii::$app->request->getRawBody()); echo '</pre>'; exit; //TODO Remove debug
     }
 
     public function actionRegister() {

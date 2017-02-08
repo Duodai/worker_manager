@@ -62,7 +62,7 @@ class Launcher implements DaemonInterface {
             exit;
         }
         if ($this->isChildExitedWithError($status)) {
-            $this->restartMasterDaemon();
+            $this->restartMasterDaemonOnError();
         }
         if($this->isChildRequestedRestart($status)){
             $this->start();
@@ -87,7 +87,7 @@ class Launcher implements DaemonInterface {
     /**
      *
      */
-    protected function restartMasterDaemon() {
+    protected function restartMasterDaemonOnError() {
         if ($this->errorCount == $this->maxErrors) {
             ConsoleHelper::msg('Max errors reached');
             exit;
@@ -102,7 +102,7 @@ class Launcher implements DaemonInterface {
      * @return bool
      */
     protected function isChildExitedNormally($status) {
-        return (pcntl_wifexited($status) && ($status === self::CHILD_NORMAL_EXIT_SIGNAL));
+        return (pcntl_wifexited($status) && (self::CHILD_NORMAL_EXIT_SIGNAL === $status));
     }
 
     /**
@@ -110,7 +110,7 @@ class Launcher implements DaemonInterface {
      * @return bool
      */
     protected function isChildExitedWithError($status) {
-        return (pcntl_wifexited($status) && (pcntl_wstopsig($status) === self::CHILD_ERROR_SIGNAL));
+        return (pcntl_wifexited($status) && (self::CHILD_ERROR_SIGNAL === pcntl_wstopsig($status)));
     }
 
     /**
@@ -118,7 +118,7 @@ class Launcher implements DaemonInterface {
      * @return bool
      */
     protected function isChildRequestedRestart($status) {
-        return (pcntl_wifexited($status) && (pcntl_wstopsig($status) === self::CHILD_RESTART_REQUEST_SIGNAL));
+        return (pcntl_wifexited($status) && (self::CHILD_RESTART_REQUEST_SIGNAL === pcntl_wstopsig($status)));
     }
 
     /**
