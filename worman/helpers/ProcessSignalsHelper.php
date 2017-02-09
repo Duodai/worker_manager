@@ -7,12 +7,7 @@ namespace app\worman\helpers;
 /**
  * Class ProcessSignalsHelper
  *
- * Methods to work with pcntl_signals
- * (Originally made for TQP)
- *
- * @author Michael Janus <abyssal@mail.ru>
- *
- * @package app\helpers
+ * @package app\worman\helpers
  */
 class ProcessSignalsHelper
 {
