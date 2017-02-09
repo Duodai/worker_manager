@@ -9,6 +9,8 @@ use Webmozart\Assert\Assert;
 class ConsoleHelper
 {
 
+    const DEV_NULL_PATH = '/dev/null';
+
     /**
      * Print message
      * @param string $message
@@ -20,9 +22,16 @@ class ConsoleHelper
         echo "$date $message" . PHP_EOL;
     }
 
-    public static function unbind(DaemonInterface $daemon)
+    /**
+     * Daemonize (unbind from console)
+     *
+     * @param DaemonInterface $daemon
+     * @param string $stdOutFilePath
+     * @param string $stdErrFilePath
+     * @throws LauncherException
+     */
+    public static function unbind(DaemonInterface $daemon, string $stdOutFilePath, string $stdErrFilePath)
     {
-        // daemonize (unbind from console)
         $pid = pcntl_fork();
         if ($pid === -1) {
             throw new LauncherException(__METHOD__ . ' error: process forking failed');
@@ -30,21 +39,27 @@ class ConsoleHelper
             self::msg('process ' . $pid . ' unbound');
             exit;
         } else {
-            self::redirectOutput();
+            self::redirectOutput($stdOutFilePath, $stdErrFilePath);
             $daemon->start();
         }
     }
 
-    protected static function redirectOutput() {
+    /**
+     * Drop STDIN, redirect STDOUT and STDERR
+     * @param string $stdOutFilePath
+     * @param string $stdErrFilePath
+     */
+    public static function redirectOutput(string $stdOutFilePath, string $stdErrFilePath)
+    {
         global $STDIN;
         global $STDOUT;
         global $STDERR;
         fclose(STDIN);
         fclose(STDOUT);
         fclose(STDERR);
-        $STDIN = fopen('/dev/null', 'r');
-        $STDOUT = fopen(\Yii::getAlias('@runtime').'/logs/application.log', 'wb');
-        $STDERR = fopen(\Yii::getAlias('@runtime').'/logs/error.log', 'wb');
+        $STDIN = fopen(self::DEV_NULL_PATH, 'r');
+        $STDOUT = fopen($stdOutFilePath, 'wb');
+        $STDERR = fopen($stdErrFilePath, 'wb');
     }
 
 }

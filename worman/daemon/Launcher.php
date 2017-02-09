@@ -12,7 +12,8 @@ use app\worman\interfaces\DaemonInterface;
  * Launch Master daemon and ensure it stays running
  * @package app\worman\daemon
  */
-class Launcher implements DaemonInterface {
+class Launcher implements DaemonInterface
+{
 
     const CHILD_NORMAL_EXIT_SIGNAL = 0;
     const CHILD_ERROR_SIGNAL = 1;
@@ -30,7 +31,8 @@ class Launcher implements DaemonInterface {
     /**
      * @throws LauncherException
      */
-    public function start() {
+    public function start()
+    {
         $processId = pcntl_fork();
         if ($processId === -1) {
             $this->forkingErrorAction();
@@ -44,14 +46,16 @@ class Launcher implements DaemonInterface {
     /**
      * @throws LauncherException
      */
-    protected function forkingErrorAction() {
+    protected function forkingErrorAction()
+    {
         throw new LauncherException(__METHOD__ . ' error: process forking failed');
     }
 
     /**
      * @param $childProcessId
      */
-    protected function parentProcessAction($childProcessId) {
+    protected function parentProcessAction(int $childProcessId)
+    {
         pcntl_waitpid($childProcessId, $status);
         if ($this->isChildExitedNormally($status)) {
             ConsoleHelper::msg('Normal exit');
@@ -64,7 +68,7 @@ class Launcher implements DaemonInterface {
         if ($this->isChildExitedWithError($status)) {
             $this->restartMasterDaemonOnError();
         }
-        if($this->isChildRequestedRestart($status)){
+        if ($this->isChildRequestedRestart($status)) {
             $this->start();
         }
     }
@@ -72,14 +76,16 @@ class Launcher implements DaemonInterface {
     /**
      *
      */
-    protected function childProcessAction() {
+    protected function childProcessAction()
+    {
         $this->runMasterDaemon();
     }
 
     /**
      * @throws LauncherException
      */
-    protected function runMasterDaemon() {
+    protected function runMasterDaemon()
+    {
         $daemon = new MasterDaemon();
         $daemon->start();
     }
@@ -87,7 +93,8 @@ class Launcher implements DaemonInterface {
     /**
      *
      */
-    protected function restartMasterDaemonOnError() {
+    protected function restartMasterDaemonOnError()
+    {
         if ($this->errorCount == $this->maxErrors) {
             ConsoleHelper::msg('Max errors reached');
             exit;
@@ -101,7 +108,8 @@ class Launcher implements DaemonInterface {
      * @param $status
      * @return bool
      */
-    protected function isChildExitedNormally($status) {
+    protected function isChildExitedNormally(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_NORMAL_EXIT_SIGNAL === $status));
     }
 
@@ -109,7 +117,8 @@ class Launcher implements DaemonInterface {
      * @param $status
      * @return bool
      */
-    protected function isChildExitedWithError($status) {
+    protected function isChildExitedWithError(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_ERROR_SIGNAL === pcntl_wstopsig($status)));
     }
 
@@ -117,7 +126,8 @@ class Launcher implements DaemonInterface {
      * @param $status
      * @return bool
      */
-    protected function isChildRequestedRestart($status) {
+    protected function isChildRequestedRestart(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_RESTART_REQUEST_SIGNAL === pcntl_wstopsig($status)));
     }
 
@@ -125,7 +135,8 @@ class Launcher implements DaemonInterface {
      * @param $status
      * @return bool
      */
-    protected function isChildTerminated($status) {
+    protected function isChildTerminated(int $status)
+    {
         return pcntl_wifsignaled($status);
     }
 }
