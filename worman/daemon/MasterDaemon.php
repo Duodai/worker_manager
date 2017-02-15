@@ -3,14 +3,42 @@
 namespace app\worman\daemon;
 
 use app\worman\helpers\ConsoleHelper;
+use app\worman\interfaces\DaemonInterface;
+use app\worman\interfaces\SystemScannerInterface;
 
-class MasterDaemon
+class MasterDaemon implements DaemonInterface
 {
 
+    /**
+     * @var SystemScannerInterface
+     */
+    protected $systemScanner;
+
+    /**
+     * @var
+     */
+    protected $sid;
+
+    /**
+     * @var
+     */
+    protected $masterConfig;
+
+    /**
+     * @var
+     */
+    protected $workerConfig;
+
+    public function __construct()
+    {
+
+    }
+    
     public function start()
     {
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
+
         // запуск воркеров: количество должно браться: в порядке приоритетнеости:
         // 1. конфиг из контрол центра(принудительная настройка) 2. авторегулировка 3. дефолты
         // вопрос: как будет авторегулировка взаимодействовать с дефолтами?
@@ -32,7 +60,7 @@ class MasterDaemon
         1. запуск
         2. получить свой пид
         3. запустить скан системы
-        4. отправить данные на сервер
+        4. отправить данные на сервер // по итогам обкатки и профилирования возможно понадобится сократить количество запросов
         5. получить сид с сервера
         6. получить настройки с сервера
         7. собрать результирующие настройки
