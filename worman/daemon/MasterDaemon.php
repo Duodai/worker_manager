@@ -2,6 +2,7 @@
 
 namespace app\worman\daemon;
 
+use app\worman\config\WorkerConfig;
 use app\worman\helpers\ConsoleHelper;
 use app\worman\interfaces\DaemonInterface;
 use app\worman\interfaces\SystemScannerInterface;
@@ -25,9 +26,11 @@ class MasterDaemon implements DaemonInterface
     protected $masterConfig;
 
     /**
-     * @var
+     * @var WorkerConfig
      */
     protected $workerConfig;
+
+    protected $communicator;
 
     public function __construct()
     {
@@ -38,6 +41,7 @@ class MasterDaemon implements DaemonInterface
     {
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
+        $this->systemScanner->init();
 
         // запуск воркеров: количество должно браться: в порядке приоритетнеости:
         // 1. конфиг из контрол центра(принудительная настройка) 2. авторегулировка 3. дефолты
@@ -54,6 +58,8 @@ class MasterDaemon implements DaemonInterface
 
 
         надо куда-то сейвить пид чтобы можно было кильнуть процесс
+
+        надо решить, как перезапускать воркера при изменении настроек или кода.
 
         флоу:
 
