@@ -1,6 +1,6 @@
 <?php
 
-namespace app\worman\components;
+namespace duodai\worman\components;
 
 use Linfo\Linfo;
 use Linfo\OS\Linux;
