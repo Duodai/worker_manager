@@ -1,9 +1,9 @@
 <?php
 
-namespace app\worman\helpers;
+namespace duodai\worman\helpers;
 
-use app\worman\exceptions\LauncherException;
-use app\worman\interfaces\DaemonInterface;
+use duodai\worman\exceptions\LauncherException;
+use duodai\worman\interfaces\DaemonInterface;
 use Webmozart\Assert\Assert;
 
 class ConsoleHelper

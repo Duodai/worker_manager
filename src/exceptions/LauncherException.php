@@ -1,6 +1,6 @@
 <?php
 
-namespace app\worman\exceptions;
+namespace duodai\worman\exceptions;
 
 class LauncherException extends \Exception
 {

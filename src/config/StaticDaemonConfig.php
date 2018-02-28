@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
+
 
 namespace duodai\worman\config;
 
 use duodai\worman\interfaces\DaemonConfigInterface;
 
-class DaemonConfig implements DaemonConfigInterface
+class StaticDaemonConfig implements DaemonConfigInterface
 {
 
 }

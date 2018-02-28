@@ -1,31 +1,31 @@
 <?php
 
 
-namespace app\worman\daemon;
+namespace duodai\worman\daemon;
 
-use app\worman\exceptions\LauncherException;
-use app\worman\helpers\ConsoleHelper;
-use app\worman\interfaces\DaemonInterface;
+use duodai\worman\config\DaemonConfig;
+use duodai\worman\exceptions\LauncherException;
+use duodai\worman\helpers\ConsoleHelper;
+use duodai\worman\interfaces\LauncherInterface;
 
 /**
  * Class Launcher
  * Launch Master daemon and ensure it stays running
  * @author Michael Janus <mailto:abyssal@mail.ru>
- * @package app\worman\daemon
+ * @package duodai\worman\daemon
  */
-class Launcher implements DaemonInterface
+class Launcher implements LauncherInterface
 {
 
-    const CHILD_NORMAL_EXIT_SIGNAL = 0;
-    const CHILD_ERROR_SIGNAL = 1;
-    const CHILD_RESTART_REQUEST_SIGNAL = 2;
+    private const CHILD_NORMAL_EXIT_SIGNAL = 0;
+    private const CHILD_ERROR_SIGNAL = 1;
+    private const CHILD_RESTART_REQUEST_SIGNAL = 2;
 
     /**
      * @var int
      */
     private $errorCount = 0;
     /**
-     * TODO Move this to json config
      * @var int
      */
     private $maxErrors = 3;
@@ -33,7 +33,9 @@ class Launcher implements DaemonInterface
     /**
      * @throws LauncherException
      */
-    public function start() {
+    public function start()
+    {
+        // msg start time
         $processId = pcntl_fork();
         if ($processId === -1) {
             $this->forkingErrorAction();
@@ -47,14 +49,16 @@ class Launcher implements DaemonInterface
     /**
      * @throws LauncherException
      */
-    protected function forkingErrorAction() {
+    protected function forkingErrorAction()
+    {
         throw new LauncherException(__METHOD__ . ' error: process forking failed');
     }
 
     /**
      * @param $childProcessId
      */
-    protected function parentProcessAction(int $childProcessId) {
+    protected function parentProcessAction(int $childProcessId)
+    {
         pcntl_waitpid($childProcessId, $status);
         if ($this->isChildExitedNormally($status)) {
             ConsoleHelper::msg('Normal exit');
@@ -75,22 +79,26 @@ class Launcher implements DaemonInterface
     /**
      *
      */
-    protected function childProcessAction() {
+    protected function childProcessAction()
+    {
         $this->runMasterDaemon();
     }
 
     /**
      * @throws LauncherException
      */
-    protected function runMasterDaemon() {
-        $daemon = new MasterDaemon();
+    protected function runMasterDaemon()
+    {
+        $config = new DaemonConfig();
+        $daemon = new MasterDaemon($config);
         $daemon->start();
     }
 
     /**
      *
      */
-    protected function restartMasterDaemonOnError() {
+    protected function restartMasterDaemonOnError()
+    {
         if ($this->errorCount == $this->maxErrors) {
             ConsoleHelper::msg('Max errors reached');
             exit;
@@ -104,7 +112,8 @@ class Launcher implements DaemonInterface
      * @param $status
      * @return bool
      */
-    protected function isChildExitedNormally(int $status) {
+    protected function isChildExitedNormally(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_NORMAL_EXIT_SIGNAL === $status));
     }
 
@@ -112,7 +121,8 @@ class Launcher implements DaemonInterface
      * @param $status
      * @return bool
      */
-    protected function isChildExitedWithError(int $status) {
+    protected function isChildExitedWithError(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_ERROR_SIGNAL === pcntl_wstopsig($status)));
     }
 
@@ -120,7 +130,8 @@ class Launcher implements DaemonInterface
      * @param $status
      * @return bool
      */
-    protected function isChildRequestedRestart(int $status) {
+    protected function isChildRequestedRestart(int $status)
+    {
         return (pcntl_wifexited($status) && (self::CHILD_RESTART_REQUEST_SIGNAL === pcntl_wstopsig($status)));
     }
 
@@ -128,7 +139,8 @@ class Launcher implements DaemonInterface
      * @param $status
      * @return bool
      */
-    protected function isChildTerminated(int $status) {
+    protected function isChildTerminated(int $status)
+    {
         return pcntl_wifsignaled($status);
     }
 }

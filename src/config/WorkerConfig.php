@@ -1,6 +1,6 @@
 <?php
 
-namespace app\worman\config;
+namespace duodai\worman\config;
 
 class WorkerConfig
 {

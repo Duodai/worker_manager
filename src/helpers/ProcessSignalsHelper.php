@@ -1,13 +1,13 @@
 <?php
 
 
-namespace app\worman\helpers;
+namespace duodai\worman\helpers;
 
 
 /**
  * Class ProcessSignalsHelper
  *
- * @package app\worman\helpers
+ * @package duodai\worman\helpers
  */
 class ProcessSignalsHelper
 {

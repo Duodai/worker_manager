@@ -1,7 +1,7 @@
 <?php
+declare(strict_types=1);
 
-
-namespace app\worman\interfaces;
+namespace duodai\worman\interfaces;
 
 
 interface SystemScannerInterface

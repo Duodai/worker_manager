@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\worman\interfaces;
+namespace duodai\worman\interfaces;
 
 
 interface CommunicatorInterface
