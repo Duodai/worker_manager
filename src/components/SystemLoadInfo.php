@@ -2,10 +2,11 @@
 
 namespace duodai\worman\components;
 
+use duodai\worman\interfaces\SystemScannerInterface;
 use Linfo\Linfo;
 use Linfo\OS\Linux;
 
-class SystemLoadInfo
+class SystemLoadInfo implements SystemScannerInterface
 {
 
     /**

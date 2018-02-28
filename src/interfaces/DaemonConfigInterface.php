@@ -8,4 +8,7 @@ namespace duodai\worman\interfaces;
 interface DaemonConfigInterface
 {
 
+    public function getWorkersQuantity() :int;
+
+
 }

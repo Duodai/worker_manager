@@ -72,6 +72,7 @@ class Launcher implements LauncherInterface
             $this->restartMasterDaemonOnError();
         }
         if ($this->isChildRequestedRestart($status)) {
+            ConsoleHelper::msg('Process restarted by own request');
             $this->start();
         }
     }
@@ -99,8 +100,9 @@ class Launcher implements LauncherInterface
      */
     protected function restartMasterDaemonOnError()
     {
+        sleep(1);
         if ($this->errorCount == $this->maxErrors) {
-            ConsoleHelper::msg('Max errors reached');
+            ConsoleHelper::msg('Max errors reached. Application stopped.');
             exit;
         }
         ConsoleHelper::msg('Restart because of error. Try #' . ($this->errorCount + 1));

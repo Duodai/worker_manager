@@ -40,7 +40,7 @@ class ConsoleHelper
             exit;
         } else {
             self::redirectOutput($stdOutFilePath, $stdErrFilePath);
-            $daemon->start();
+            $daemon->run();
         }
     }
 

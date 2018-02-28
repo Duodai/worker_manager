@@ -30,7 +30,7 @@ class MasterDaemon
      */
     protected $workerConfig;
 
-    protected $communicator;
+    protected $stop = false;
 
     public function __construct(DaemonConfigInterface $config)
     {
@@ -41,7 +41,14 @@ class MasterDaemon
     {
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
-        $this->systemScanner->init();
+        while(false === $this->stop){
+            $maxProcesses = $this->masterConfig->getWorkersQuantity();
+
+        }
     }
 
+    protected function startWorker()
+    {
+
+    }
 }
