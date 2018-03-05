@@ -3,9 +3,11 @@
 namespace duodai\worman\daemon;
 
 use duodai\worman\config\WorkerConfig;
+use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
 use duodai\worman\interfaces\DaemonConfigInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
+use duodai\worman\interfaces\WorkerInterface;
 
 class MasterDaemon
 {
@@ -30,6 +32,8 @@ class MasterDaemon
      */
     protected $workerConfig;
 
+    protected $workers = [];
+
     protected $stop = false;
 
     public function __construct(DaemonConfigInterface $config)
@@ -42,12 +46,51 @@ class MasterDaemon
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
         while(false === $this->stop){
-            $maxProcesses = $this->masterConfig->getWorkersQuantity();
-
+            if($this->isMaxWorkersCountReached()){
+                pcntl_wait($status);
+                //TODO make behaviors for different statuses
+            }
+            $this->startWorker();
         }
     }
 
-    protected function startWorker()
+    protected function startWorker():int
+    {
+        $pid = pcntl_fork();
+        if(false === $pid){
+            $this->error();
+        }
+        if($pid > 0 ){
+            $this->workers[] = $pid;
+        }else{
+            $worker = $this->getAvailableWorker();
+            $worker->execute();
+        }
+        return $pid;
+    }
+
+    protected function isMaxWorkersCountReached()
+    {
+        $maxProcesses = $this->masterConfig->getWorkersQuantity();
+        return (count($this->workers) >= $maxProcesses);
+    }
+
+    protected function error()
+    {
+        throw new MasterDaemonException('worker fork error');
+    }
+
+    protected function addProcess()
+    {
+
+    }
+
+    protected function cleanUpProcesses()
+    {
+
+    }
+
+    protected function getAvailableWorker():WorkerInterface
     {
 
     }
