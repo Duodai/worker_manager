@@ -2,9 +2,11 @@
 
 namespace duodai\worman\daemon;
 
-use duodai\worman\config\WorkerConfig;
+use duodai\worman\dto\WorkerResponse;
 use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
+use duodai\worman\helpers\ProcessHelper;
+use duodai\worman\interfaces\BalancerInterface;
 use duodai\worman\interfaces\DaemonConfigInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
 use duodai\worman\interfaces\WorkerInterface;
@@ -17,38 +19,33 @@ class MasterDaemon
      */
     protected $systemScanner;
 
+    protected $startTime;
+
     /**
      * @var
      */
     protected $sid;
 
-    /**
-     * @var DaemonConfigInterface
-     */
-    protected $masterConfig;
+    protected $pool = [];
 
-    /**
-     * @var WorkerConfig
-     */
-    protected $workerConfig;
-
-    protected $workers = [];
+    protected $processes = [];
 
     protected $stop = false;
 
-    public function __construct(DaemonConfigInterface $config)
+    public function __construct(DaemonConfigInterface $config, BalancerInterface $balancer)
     {
         $this->masterConfig = $config;
     }
     
     public function start()
     {
+        $this->startTime = time();
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
         while(false === $this->stop){
             if($this->isMaxWorkersCountReached()){
-                pcntl_wait($status);
-                //TODO make behaviors for different statuses
+                $pid = pcntl_wait($status);
+                $this->processResponse($pid, $status);
             }
             $this->startWorker();
         }
@@ -61,7 +58,7 @@ class MasterDaemon
             $this->error();
         }
         if($pid > 0 ){
-            $this->workers[] = $pid;
+            $this->addProcess($pid);
         }else{
             $worker = $this->getAvailableWorker();
             $worker->execute();
@@ -80,14 +77,43 @@ class MasterDaemon
         throw new MasterDaemonException('worker fork error');
     }
 
-    protected function addProcess()
+    protected function processResponse(int $pid, int $status)
+    {
+        $stats = $this->processes[$pid];
+        unset($this->processes[$pid]);
+        switch ($status){
+            case WorkerResponse::SUCCESS:
+                break;
+            case WorkerResponse::IDLE:
+                break;
+            case WorkerResponse::ERROR:
+                break;
+            default:
+                throw new \Exception('unknown response code');
+                break;
+        }
+
+    }
+
+    protected function addProcess($pid, string $alias)
+    {
+        $this->processes[$pid]['alias'] = $alias;
+        $this->processes[$pid]['start'] = microtime(true);
+    }
+
+    protected function saveStatistic()
     {
 
     }
 
     protected function cleanUpProcesses()
     {
-
+        $pids = array_keys($this->processes);
+        foreach ($pids as $pid) {
+            if(!ProcessHelper::isRunning($pid)){
+                unset($this->processes[$pid]);
+            }
+        }
     }
 
     protected function getAvailableWorker():WorkerInterface
