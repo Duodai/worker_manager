@@ -2,24 +2,32 @@
 
 namespace duodai\worman\daemon;
 
-use duodai\worman\dto\WorkerResponse;
+use duodai\worman\dictionary\WorkerResponse;
 use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
 use duodai\worman\helpers\ProcessHelper;
 use duodai\worman\interfaces\BalancerInterface;
 use duodai\worman\interfaces\DaemonConfigInterface;
+use duodai\worman\interfaces\MasterDaemonInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
 use duodai\worman\interfaces\WorkerInterface;
+use Psr\Log\LoggerInterface;
 
-class MasterDaemon
+class MasterDaemon implements MasterDaemonInterface
 {
 
+
+    protected $instanceId;
     /**
      * @var SystemScannerInterface
      */
     protected $systemScanner;
 
     protected $startTime;
+
+    protected $balancer;
+
+    protected $logger;
 
     /**
      * @var
@@ -32,12 +40,16 @@ class MasterDaemon
 
     protected $stop = false;
 
-    public function __construct(DaemonConfigInterface $config, BalancerInterface $balancer)
+    public function __construct(string $instanceId, DaemonConfigInterface $config, BalancerInterface $balancer, LoggerInterface $logger)
     {
+        $this->startTime = time();
+        $this->instanceId = $instanceId;
         $this->masterConfig = $config;
+        $this->balancer = $balancer;
+        $this->logger = $logger;
     }
     
-    public function start()
+    public function run()
     {
         $this->startTime = time();
         $pid = getmypid();

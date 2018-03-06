@@ -1,0 +1,18 @@
+{
+  "maxUptime":86400,
+  "coolDown": 500000,
+  "workers":{
+    "newPlayer":{
+      "quantity": 1,
+      "class": ""
+    },
+    "gameStarted":{
+      "quantity": 1,
+      "class": ""
+    },
+    "gameEnded":{
+      "quantity": 1,
+      "class": ""
+    }
+  }
+}

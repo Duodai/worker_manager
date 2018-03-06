@@ -6,5 +6,5 @@ namespace duodai\worman\interfaces;
 interface LauncherInterface {
 
 
-    public function start();
+    public function run();
 }

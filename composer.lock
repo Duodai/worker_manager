@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "850781b4783eaf950b57ffbc4aad47a5",
+    "content-hash": "40d783983dd7019ab17caf9967bfb535",
     "packages": [
         {
             "name": "linfo/linfo",
-            "version": "v3.0.1",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrgp/linfo.git",
-                "reference": "c6b3af3e103235ad00976ef3532c43ac32df71ff"
+                "reference": "71d38a376e1048ee71f54b159c5832f6d7c86cf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrgp/linfo/zipball/c6b3af3e103235ad00976ef3532c43ac32df71ff",
-                "reference": "c6b3af3e103235ad00976ef3532c43ac32df71ff",
+                "url": "https://api.github.com/repos/jrgp/linfo/zipball/71d38a376e1048ee71f54b159c5832f6d7c86cf5",
+                "reference": "71d38a376e1048ee71f54b159c5832f6d7c86cf5",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,54 @@
                 "specs",
                 "system"
             ],
-            "time": "2016-08-25T03:19:33+00:00"
+            "time": "2015-10-21T09:24:48+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "webmozart/assert",

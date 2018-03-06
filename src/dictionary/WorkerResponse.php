@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace duodai\worman\dto;
+namespace duodai\worman\dictionary;
 
 use duodai\amqp\common\DictNoReflection;
 

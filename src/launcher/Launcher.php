@@ -1,12 +1,14 @@
 <?php
 
 
-namespace duodai\worman\daemon;
+namespace duodai\worman\launcher;
 
-use duodai\worman\config\DaemonConfig;
+use duodai\worman\dictionary\MasterDaemonExitCodes;
 use duodai\worman\exceptions\LauncherException;
 use duodai\worman\helpers\ConsoleHelper;
 use duodai\worman\interfaces\LauncherInterface;
+use duodai\worman\interfaces\MasterDaemonFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Launcher
@@ -17,9 +19,13 @@ use duodai\worman\interfaces\LauncherInterface;
 class Launcher implements LauncherInterface
 {
 
-    private const CHILD_NORMAL_EXIT_SIGNAL = 0;
-    private const CHILD_ERROR_SIGNAL = 1;
-    private const CHILD_RESTART_REQUEST_SIGNAL = 2;
+
+    protected const LOGGING_COMPONENT_NAME = 'Worman launcher';
+
+    protected $instanceId;
+    protected $factory;
+    protected $logger;
+
 
     /**
      * @var int
@@ -30,29 +36,44 @@ class Launcher implements LauncherInterface
      */
     private $maxErrors = 3;
 
-    /**
-     * @throws LauncherException
-     */
-    public function start()
+    public function __construct(string $instanceId, MasterDaemonFactoryInterface $daemonFactory, LoggerInterface $logger)
     {
-        // msg start time
-        $processId = pcntl_fork();
-        if ($processId === -1) {
-            $this->forkingErrorAction();
-        } elseif ($processId > 0) {
-            $this->parentProcessAction($processId);
-        } else {
-            $this->childProcessAction();
-        }
+        $this->instanceId = $instanceId;
+        $this->factory = $daemonFactory;
+        $this->logger = $logger;
+        register_shutdown_function(function(){
+            $this->logger->info('Application went down.', [self::LOGGING_COMPONENT_NAME]);
+        });
     }
+
 
     /**
      * @throws LauncherException
      */
-    protected function forkingErrorAction()
+    public function run()
     {
-        throw new LauncherException(__METHOD__ . ' error: process forking failed');
+        try {
+            // msg start time
+            $processId = pcntl_fork();
+            if ($processId === -1) {
+                throw new LauncherException('process forking failed');
+            } elseif ($processId > 0) {
+                $this->parentProcessAction($processId);
+            } else {
+                $this->childProcessAction();
+            }
+        }catch (\Exception $e){
+            $this->logger->critical($e->getMessage(), [
+                self::LOGGING_COMPONENT_NAME,
+                "instanceID: {$this->instanceId}",
+                $e->getFile(),
+                $e->getLine(),
+                $e->getTraceAsString()
+            ]);
+            exit();
+        }
     }
+
 
     /**
      * @param $childProcessId
@@ -62,18 +83,18 @@ class Launcher implements LauncherInterface
         pcntl_waitpid($childProcessId, $status);
         if ($this->isChildExitedNormally($status)) {
             ConsoleHelper::msg('Normal exit');
-            exit;
+            exit(0);
         }
         if ($this->isChildTerminated($status)) {
             ConsoleHelper::msg('Process terminated');
-            exit;
+            exit(9);
         }
         if ($this->isChildExitedWithError($status)) {
             $this->restartMasterDaemonOnError();
         }
         if ($this->isChildRequestedRestart($status)) {
             ConsoleHelper::msg('Process restarted by own request');
-            $this->start();
+            $this->run();
         }
     }
 
@@ -90,9 +111,8 @@ class Launcher implements LauncherInterface
      */
     protected function runMasterDaemon()
     {
-        $config = new DaemonConfig();
-        $daemon = new MasterDaemon($config);
-        $daemon->start();
+        $daemon = $this->factory->create();
+        $daemon->run();
     }
 
     /**
@@ -102,12 +122,11 @@ class Launcher implements LauncherInterface
     {
         sleep(1);
         if ($this->errorCount == $this->maxErrors) {
-            ConsoleHelper::msg('Max errors reached. Application stopped.');
-            exit;
+            throw new LauncherException('Master daemon execution failed');
         }
         ConsoleHelper::msg('Restart because of error. Try #' . ($this->errorCount + 1));
         $this->errorCount++;
-        $this->start();
+        $this->run();
     }
 
     /**
@@ -116,7 +135,7 @@ class Launcher implements LauncherInterface
      */
     protected function isChildExitedNormally(int $status)
     {
-        return (pcntl_wifexited($status) && (self::CHILD_NORMAL_EXIT_SIGNAL === $status));
+        return (pcntl_wifexited($status) && (MasterDaemonExitCodes::NORMAL_EXIT === $status));
     }
 
     /**
@@ -125,7 +144,7 @@ class Launcher implements LauncherInterface
      */
     protected function isChildExitedWithError(int $status)
     {
-        return (pcntl_wifexited($status) && (self::CHILD_ERROR_SIGNAL === pcntl_wstopsig($status)));
+        return (pcntl_wifexited($status) && (MasterDaemonExitCodes::ERROR === pcntl_wstopsig($status)));
     }
 
     /**
@@ -134,7 +153,7 @@ class Launcher implements LauncherInterface
      */
     protected function isChildRequestedRestart(int $status)
     {
-        return (pcntl_wifexited($status) && (self::CHILD_RESTART_REQUEST_SIGNAL === pcntl_wstopsig($status)));
+        return (pcntl_wifexited($status) && (MasterDaemonExitCodes::RESTART_REQUEST === pcntl_wstopsig($status)));
     }
 
     /**
