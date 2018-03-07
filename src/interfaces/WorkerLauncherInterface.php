@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace duodai\worman\interfaces;
 
 
-class WorkerLauncherInterface
+interface WorkerLauncherInterface
 {
 
-    public function run(WorkerInterface $worker)
-    {
-
-    }
+    public function run(WorkerInterface $worker);
 }

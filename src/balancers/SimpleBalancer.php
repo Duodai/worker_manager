@@ -5,7 +5,12 @@ declare(strict_types=1);
 class SimpleBalancer
 {
 
-    protected $config;
+    protected $state;
+
+    public function setState()
+    {
+
+    }
 
     public function getWorkerList()
     {
