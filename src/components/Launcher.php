@@ -1,7 +1,7 @@
 <?php
 
 
-namespace duodai\worman\launcher;
+namespace duodai\worman\components;
 
 use duodai\worman\dictionary\MasterDaemonExitCodes;
 use duodai\worman\exceptions\LauncherException;
@@ -18,14 +18,11 @@ use Psr\Log\LoggerInterface;
  */
 class Launcher implements LauncherInterface
 {
-
-
     protected const LOGGING_COMPONENT_NAME = 'Worman launcher';
 
-    protected $instanceId;
     protected $factory;
     protected $logger;
-
+    protected $instanceConfig;
 
     /**
      * @var int
@@ -36,9 +33,10 @@ class Launcher implements LauncherInterface
      */
     private $maxErrors = 3;
 
-    public function __construct(string $instanceId, MasterDaemonFactoryInterface $daemonFactory, LoggerInterface $logger)
+    public function __construct(InstanceConfig $instanceConfig, MasterDaemonFactoryInterface $daemonFactory, LoggerInterface $logger)
     {
-        $this->instanceId = $instanceId;
+
+        $this->instanceConfig = $instanceConfig;
         $this->factory = $daemonFactory;
         $this->logger = $logger;
         register_shutdown_function(function(){
@@ -65,7 +63,7 @@ class Launcher implements LauncherInterface
         }catch (\Exception $e){
             $this->logger->critical($e->getMessage(), [
                 self::LOGGING_COMPONENT_NAME,
-                "instanceID: {$this->instanceId}",
+                "instanceID: {$this->instanceConfig->getInstanceId()}",
                 $e->getFile(),
                 $e->getLine(),
                 $e->getTraceAsString()

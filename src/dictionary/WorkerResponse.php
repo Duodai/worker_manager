@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace duodai\worman\dictionary;
 
-use duodai\amqp\common\DictNoReflection;
+use duodai\amqp\common\ConstantsDictionaryNoReflection;
 
-class WorkerResponse extends DictNoReflection
+class WorkerResponse extends ConstantsDictionaryNoReflection
 {
     const SUCCESS = 0;
     const IDLE = 1;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace duodai\amqp\common;
+namespace duodai\worman\common;
 
 /**
  * Helper to simplify usage of ReflectionClass
@@ -9,7 +9,7 @@ namespace duodai\amqp\common;
  * @author Michael Janus <abyssal@mail.ru>
  */
 class ReflectionHelper
-{ //TODO Make stand-alone package for helpers and common classes
+{
 
     /**
      * Returns class name without namespace

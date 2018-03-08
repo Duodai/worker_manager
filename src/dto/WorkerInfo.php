@@ -5,19 +5,26 @@ declare(strict_types=1);
 namespace duodai\worman\dto;
 
 
+use duodai\worman\interfaces\WorkerInterface;
+
 class WorkerInfo
 {
 
     protected $alias;
+    protected $className;
     protected $startTime;
     protected $finishTime;
 
-    public function __construct(string $alias)
+    public function __construct(string $alias, string $class)
     {
         if(0 === strlen($alias)){
             throw new \Exception('alias can not be an empty string');
         }
         $this->alias = $alias;
+        if(!class_exists($class) || !($class instanceof WorkerInterface)){
+            throw new \Exception('Invalid worker class');
+        }
+        $this->className = $class;
     }
 
     public function getAlias()

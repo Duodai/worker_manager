@@ -1,16 +1,14 @@
 <?php
 
 
-namespace duodai\amqp\common;
+namespace duodai\worman\common;
 
 /**
- * Class DictNoReflection
+ * Class ConstantsDictionary
  * Base class for constant value lists
- * Significantly faster than reflection-based realisation but requires value list hard-coding
  * @author Michael Janus <mailto:abyssal@mail.ru>
  */
-abstract class DictNoReflection
-{
+abstract class ConstantsDictionary {
     /**
      * Current value
      *
@@ -24,7 +22,7 @@ abstract class DictNoReflection
      */
     final public function __construct($value)
     {
-        if (in_array($value, $this->getValueList())) {
+        if (ReflectionHelper::isClassConstantValue($value, $this)) {
             $this->value = $value;
         } else {
             throw new \InvalidArgumentException($this->errorMessage($value));
@@ -53,10 +51,4 @@ abstract class DictNoReflection
     {
         return $this->value;
     }
-
-    /**
-     * List constants here for argument validation.
-     * @return array
-     */
-    abstract protected function getValueList():array;
 }

@@ -7,7 +7,8 @@ namespace duodai\worman\interfaces;
 
 use duodai\worman\dto\Config;
 
-interface ConfigurableInterface
+interface ConfigStorageInterface
 {
-    public function reload(Config $config);
+
+    public function load(string $instanceId):Config;
 }

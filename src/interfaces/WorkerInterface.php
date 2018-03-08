@@ -4,7 +4,7 @@
 namespace duodai\worman\interfaces;
 
 
-use duodai\worman\dto\WorkerResponse;
+use duodai\worman\dictionary\WorkerResponse;
 
 interface WorkerInterface
 {

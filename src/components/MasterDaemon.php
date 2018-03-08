@@ -1,33 +1,40 @@
 <?php
 
-namespace duodai\worman\daemon;
+namespace duodai\worman\components;
 
 use duodai\worman\dictionary\WorkerResponse;
+use duodai\worman\dto\Config;
 use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
 use duodai\worman\helpers\ProcessHelper;
 use duodai\worman\interfaces\BalancerInterface;
-use duodai\worman\interfaces\DaemonConfigInterface;
+use duodai\worman\interfaces\ConfigurableInterface;
 use duodai\worman\interfaces\MasterDaemonInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
 use duodai\worman\interfaces\WorkerInterface;
+use duodai\worman\worker\WorkerLauncher;
 use Psr\Log\LoggerInterface;
 
-class MasterDaemon implements MasterDaemonInterface
+class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
 {
 
-
-    protected $instanceId;
+    protected $instanceConfig;
     /**
      * @var SystemScannerInterface
      */
     protected $systemScanner;
+
+    protected $config;
 
     protected $startTime;
 
     protected $balancer;
 
     protected $logger;
+
+    protected $configurator;
+
+    protected $workerLauncher;
 
     /**
      * @var
@@ -40,26 +47,41 @@ class MasterDaemon implements MasterDaemonInterface
 
     protected $stop = false;
 
-    public function __construct(string $instanceId, DaemonConfigInterface $config, BalancerInterface $balancer, LoggerInterface $logger)
+    public function __construct(
+        InstanceConfig $instanceConfig,
+        Configurator $configurator,
+        WorkerLauncher $workerLauncher,
+        BalancerInterface $balancer,
+        SystemScannerInterface $systemScanner,
+        LoggerInterface $logger)
     {
         $this->startTime = time();
-        $this->instanceId = $instanceId;
-        $this->masterConfig = $config;
+        $this->instanceConfig = $instanceConfig;
+        $this->configurator = $configurator;
         $this->balancer = $balancer;
         $this->logger = $logger;
+        $this->workerLauncher = $workerLauncher;
+        $this->configurator->addConfigurable($this);
+        $this->configurator->addConfigurable($balancer);
+        $this->configurator->refresh();
     }
-    
+
+    public function reload(Config $config)
+    {
+        $this->config = $config->getMasterDaemonConfig();
+    }
+
     public function run()
     {
         $this->startTime = time();
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
         while(false === $this->stop){
-            if($this->isMaxWorkersCountReached()){
-                $pid = pcntl_wait($status);
-                $this->processResponse($pid, $status);
-            }
-            $this->startWorker();
+            // получить список воркеров
+            // применить к мультипликаторам коэффициенты
+            // заспаунить объекты конфигураций
+            // инстанцировать по очереди пока не забьются лимиты
+
         }
     }
 
@@ -78,11 +100,7 @@ class MasterDaemon implements MasterDaemonInterface
         return $pid;
     }
 
-    protected function isMaxWorkersCountReached()
-    {
-        $maxProcesses = $this->masterConfig->getWorkersQuantity();
-        return (count($this->workers) >= $maxProcesses);
-    }
+
 
     protected function error()
     {
