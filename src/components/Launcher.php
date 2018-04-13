@@ -53,7 +53,7 @@ class Launcher implements LauncherInterface
         try {
             // msg start time
             $processId = pcntl_fork();
-            if ($processId === -1) {
+            if (-1 === $processId) {
                 throw new LauncherException('process forking failed');
             } elseif ($processId > 0) {
                 $this->parentProcessAction($processId);
