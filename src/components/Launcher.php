@@ -33,6 +33,12 @@ class Launcher implements LauncherInterface
      */
     private $maxErrors = 3;
 
+    /**
+     * Launcher constructor.
+     * @param InstanceConfig $instanceConfig
+     * @param MasterDaemonFactoryInterface $daemonFactory
+     * @param LoggerInterface $logger
+     */
     public function __construct(InstanceConfig $instanceConfig, MasterDaemonFactoryInterface $daemonFactory, LoggerInterface $logger)
     {
 
@@ -44,14 +50,13 @@ class Launcher implements LauncherInterface
         });
     }
 
-
     /**
-     * @throws LauncherException
+     *
      */
     public function run()
     {
         try {
-            // msg start time
+            ConsoleHelper::msg('Worman launcher started');
             $processId = pcntl_fork();
             if (-1 === $processId) {
                 throw new LauncherException('process forking failed');
@@ -72,9 +77,9 @@ class Launcher implements LauncherInterface
         }
     }
 
-
     /**
-     * @param $childProcessId
+     * @param int $childProcessId
+     * @throws LauncherException
      */
     protected function parentProcessAction(int $childProcessId)
     {
@@ -104,8 +109,9 @@ class Launcher implements LauncherInterface
         $this->runMasterDaemon();
     }
 
+
     /**
-     * @throws LauncherException
+     *
      */
     protected function runMasterDaemon()
     {
@@ -114,7 +120,7 @@ class Launcher implements LauncherInterface
     }
 
     /**
-     *
+     * @throws LauncherException
      */
     protected function restartMasterDaemonOnError()
     {

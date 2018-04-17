@@ -8,7 +8,7 @@ namespace duodai\worman\components;
 /**
  * Class InstanceConfig
  * Application instance-wide constants.
- * Made as immutable class + singleton to ensure same settings are given to each application component
+ * Immutable.
  * @package duodai\worman\components
  */
 class InstanceConfig
@@ -52,11 +52,10 @@ class InstanceConfig
      */
     public static function instance(string $id)
     {
-        if(is_null(static::$instance)){
+        if (is_null(static::$instance)) {
             static::$instance = new static();
             static::$instance->setInstanceId($id);
         }
         return static::$instance;
     }
-
 }

@@ -4,6 +4,8 @@ namespace duodai\worman\components;
 
 use duodai\worman\dictionary\WorkerResponse;
 use duodai\worman\dto\Config;
+use duodai\worman\dto\WorkerConfig;
+use duodai\worman\dto\ProcessInfo;
 use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
 use duodai\worman\helpers\ProcessHelper;
@@ -12,28 +14,50 @@ use duodai\worman\interfaces\ConfigurableInterface;
 use duodai\worman\interfaces\MasterDaemonInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
 use duodai\worman\interfaces\WorkerInterface;
+use duodai\worman\interfaces\WorkerLauncherInterface;
 use duodai\worman\worker\WorkerLauncher;
 use Psr\Log\LoggerInterface;
 
 class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
 {
 
+    /**
+     * @var InstanceConfig
+     */
     protected $instanceConfig;
     /**
      * @var SystemScannerInterface
      */
     protected $systemScanner;
 
+    /**
+     * @var
+     */
     protected $config;
 
+    /**
+     * @var int
+     */
     protected $startTime;
 
+    /**
+     * @var BalancerInterface
+     */
     protected $balancer;
 
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
+    /**
+     * @var Configurator
+     */
     protected $configurator;
 
+    /**
+     * @var WorkerLauncherInterface
+     */
     protected $workerLauncher;
 
     /**
@@ -41,19 +65,30 @@ class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
      */
     protected $sid;
 
+    /**
+     * @var array
+     */
     protected $pool = [];
 
+    /**
+     * @var array
+     */
     protected $processes = [];
 
+    /**
+     * @var bool
+     */
     protected $stop = false;
 
     public function __construct(
         InstanceConfig $instanceConfig,
         Configurator $configurator,
-        WorkerLauncher $workerLauncher,
+        WorkerLauncherInterface $workerLauncher,
         BalancerInterface $balancer,
         SystemScannerInterface $systemScanner,
-        LoggerInterface $logger)
+
+        LoggerInterface $logger
+    )
     {
         $this->startTime = time();
         $this->instanceConfig = $instanceConfig;
@@ -77,35 +112,58 @@ class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
         while(false === $this->stop){
-            // получить список воркеров
-            // применить к мультипликаторам коэффициенты
-            // заспаунить объекты конфигураций
-            // инстанцировать по очереди пока не забьются лимиты
+            /** @var WorkerConfig[] $workers */
+            $workers = $this->getWorkersList();
+            $workers = $this->balance(...$workers);
+            $currentWorkers = $this->getCurrentProcesses();
+
 
         }
     }
 
-    protected function startWorker():int
+    /**
+     * @return WorkerConfig[]
+     */
+    protected function getWorkersList()
+    {
+        return $this->instanceConfig->getWorkers();
+    }
+
+    /**
+     * @param WorkerConfig[] ...$workerConfigs
+     * @return WorkerConfig[]
+     */
+    protected function balance(WorkerConfig ...$workerConfigs):array
+    {
+
+    }
+
+    /**
+     * @return ProcessInfo[]
+     */
+    protected function getCurrentProcesses()
+    {
+
+    }
+
+    protected function getFreeWorkers(array $workerConfigs, array $currentWorkers)
+    {
+
+    }
+
+    protected function addWorker():int
     {
         $pid = pcntl_fork();
         if(false === $pid){
-            $this->error();
-        }
+            throw new MasterDaemonException('worker fork error');        }
         if($pid > 0 ){
-            $this->addProcess($pid);
+            // parent process
         }else{
-            $worker = $this->getAvailableWorker();
-            $worker->execute();
+            // child process
         }
         return $pid;
     }
 
-
-
-    protected function error()
-    {
-        throw new MasterDaemonException('worker fork error');
-    }
 
     protected function processResponse(int $pid, int $status)
     {
@@ -122,32 +180,7 @@ class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
                 throw new \Exception('unknown response code');
                 break;
         }
-
     }
 
-    protected function addProcess($pid, string $alias)
-    {
-        $this->processes[$pid]['alias'] = $alias;
-        $this->processes[$pid]['start'] = microtime(true);
-    }
 
-    protected function saveStatistic()
-    {
-
-    }
-
-    protected function cleanUpProcesses()
-    {
-        $pids = array_keys($this->processes);
-        foreach ($pids as $pid) {
-            if(!ProcessHelper::isRunning($pid)){
-                unset($this->processes[$pid]);
-            }
-        }
-    }
-
-    protected function getAvailableWorker():WorkerInterface
-    {
-
-    }
 }
