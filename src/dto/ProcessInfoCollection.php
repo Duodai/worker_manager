@@ -15,12 +15,17 @@ class ProcessInfoCollection
         $this->processes = $processInfo;
     }
 
-    public function getProcessIdList()
+    public function getProcessIdList():array
     {
 
     }
 
     public function getProcesses()
+    {
+
+    }
+
+    public function getProcessInfo(int $id):?ProcessInfo
     {
 
     }

@@ -6,38 +6,57 @@ namespace duodai\worman\components;
 
 
 use duodai\worman\dto\ProcessInfo;
+use duodai\worman\dto\ProcessInfoCollection;
+use duodai\worman\storage\ProcessTrackerStorage;
+use Symfony\Component\Process\Process;
 
 class ProcessTracker
 {
 
-    public function addProcess($id, $pid, $class, $startTime)
+    /**
+     * @var ProcessTrackerStorage
+     */
+    protected $storage;
+    protected $archive;
+
+    public function addProcess(string $class, int $processId, int $startTime):ProcessInfo
     {
-         // track new process
+        $process = new ProcessInfo($class, $processId, $startTime);
+         $id = $this->storage->saveProcess($process);
+         $process->setId($id);
+         return $process;
     }
 
-    public function finishProcess($id, $finishTime, $peakMemory)
+    public function finishProcess(ProcessInfo $process)
     {
-        // finish tracking process and dump data to archive
+        //remove process from storage
+        $this->storage->removeProcess($process->getId());
+        //add process to archive
     }
-
-    public function trackError($id, $errorCode, $errorMessage)
-    {
-        // add error data to tracked process
-    }
-
 
     /**
-     * @return ProcessInfo[]
+     * @return ProcessInfoCollection
      */
-    public function getCurrentProcesses():array
+    public function getCurrentProcesses():?ProcessInfoCollection
     {
-        // get list of tracked processes
+        return $this->storage->getList();
     }
 
     public function cleanUp()
     {
-        // check actual processes
-        // log error and finish for tracked non-existent processes
+        $processes = $this->getCurrentProcesses();
+        if(!is_null($processes)){
+            $processIdList = $processes->getProcessIdList();
+            foreach ($processIdList as $processId) {
+                if(!posix_kill($processId, 0)) {
+                    $process = $processes->getProcessInfo($processId);
+                    $process->setFinishTime(time());
+                    $process->setErrorCode(500);
+                    $process->setErrorMessage('Unknown error (cleaned up)');
+                    $this->finishProcess($process);
+                }
+            }
+        }
     }
 
 }

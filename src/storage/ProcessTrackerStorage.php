@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace duodai\worman\storage;
 
-
 use duodai\worman\components\InstanceConfig;
 use duodai\worman\dto\ProcessInfo;
+use duodai\worman\dto\ProcessInfoCollection;
 
+/**
+ * Class ProcessTrackerStorage
+ * @package duodai\worman\storage
+ */
 class ProcessTrackerStorage
 {
 
@@ -117,16 +121,16 @@ class ProcessTrackerStorage
     }
 
     /**
-     * @return array
+     * @return ProcessInfoCollection|null
      */
-    public function getList(): array
+    public function getList(): ?ProcessInfoCollection
     {
         $list = $this->getIdList();
         $items = [];
         foreach ($list as $id) {
             $items[$id] = $this->loadProcess($id);
         }
-        return $items;
+        return !empty($items)? new ProcessInfoCollection(...$items):null;
     }
 
     /**
