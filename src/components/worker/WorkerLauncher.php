@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace duodai\worman\worker;
+namespace duodai\worman\components\worker;
 
 
 use duodai\worman\dto\WorkerResponse;

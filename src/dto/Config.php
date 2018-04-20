@@ -14,21 +14,16 @@ class Config
     /**
      * @var array
      */
-    protected $masterDaemonConfig;
-    /**
-     * @var array
-     */
-    protected $balancerConfig;
+    protected $config;
+
 
     /**
      * Config constructor.
-     * @param array $masterDaemonConfig
-     * @param array $balancerConfig
+     * @param array $config
      */
-    public function __construct(array $masterDaemonConfig, array $balancerConfig)
+    public function __construct(array $config)
     {
-       $this->masterDaemonConfig = $masterDaemonConfig;
-       $this->balancerConfig = $balancerConfig;
+       $this->config = $config;
     }
 
     /**
@@ -36,7 +31,7 @@ class Config
      */
     public function getMasterDaemonConfig(): array
     {
-        return $this->masterDaemonConfig;
+        return $this->config['masterDaemon']; // TODO rework this later
     }
 
     /**
@@ -44,6 +39,11 @@ class Config
      */
     public function getBalancerConfig(): array
     {
-        return $this->balancerConfig;
+        return $this->config['balancer']; // TODO rework this later
+    }
+
+    public function toArray():array
+    {
+        return $this->config;
     }
 }

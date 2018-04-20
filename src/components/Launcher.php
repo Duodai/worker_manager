@@ -109,7 +109,6 @@ class Launcher implements LauncherInterface
         $this->runMasterDaemon();
     }
 
-
     /**
      *
      */

@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 
-namespace duodai\worman\storage;
+namespace duodai\worman\components\processTracker\storage;
 
 use duodai\worman\components\InstanceConfig;
-use duodai\worman\dto\ProcessInfo;
-use duodai\worman\dto\ProcessInfoCollection;
+use duodai\worman\components\processTracker\dto\ProcessInfo;
+use duodai\worman\components\processTracker\dto\ProcessInfoCollection;
 
 /**
  * Class ProcessTrackerStorage
