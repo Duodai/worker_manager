@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace duodai\worman\components\configurator;
 
-use duodai\worman\dto\Config;
+use duodai\worman\components\configurator\dto\Config;
 use duodai\worman\interfaces\ConfigStorageInterface;
 
 /**

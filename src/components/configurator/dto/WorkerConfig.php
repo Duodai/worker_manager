@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace duodai\worman\dto;
+namespace duodai\worman\components\configurator\dto;
 
 
 /**

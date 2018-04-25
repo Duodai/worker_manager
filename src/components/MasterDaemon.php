@@ -2,20 +2,16 @@
 
 namespace duodai\worman\components;
 
+use duodai\worman\components\configurator\Configurator;
+use duodai\worman\components\configurator\dto\Config;
 use duodai\worman\dictionary\WorkerResponse;
-use duodai\worman\dto\Config;
-use duodai\worman\dto\WorkerConfig;
-use duodai\worman\dto\ProcessInfo;
 use duodai\worman\exceptions\MasterDaemonException;
 use duodai\worman\helpers\ConsoleHelper;
-use duodai\worman\helpers\ProcessHelper;
 use duodai\worman\interfaces\BalancerInterface;
 use duodai\worman\interfaces\ConfigurableInterface;
 use duodai\worman\interfaces\MasterDaemonInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
-use duodai\worman\interfaces\WorkerInterface;
 use duodai\worman\interfaces\WorkerLauncherInterface;
-use duodai\worman\worker\WorkerLauncher;
 use Psr\Log\LoggerInterface;
 
 class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
@@ -86,11 +82,9 @@ class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
         WorkerLauncherInterface $workerLauncher,
         BalancerInterface $balancer,
         SystemScannerInterface $systemScanner,
-
         LoggerInterface $logger
     )
     {
-        $this->startTime = time();
         $this->instanceConfig = $instanceConfig;
         $this->configurator = $configurator;
         $this->balancer = $balancer;
@@ -111,45 +105,40 @@ class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
         $this->startTime = time();
         $pid = getmypid();
         ConsoleHelper::msg("Master daemon started. PID: $pid");
-        while(false === $this->stop){
-            /** @var WorkerConfig[] $workers */
-            $workers = $this->getWorkersList();
-            $workers = $this->balance(...$workers);
-            $currentWorkers = $this->getCurrentProcesses();
-
-
+        while(true){
+            // получить список воркеров из конфига
+            // перебалансировать список
+            // получить список текущих процессов
+            // проверить/почистить список
+            //проверить стоп-условие
+              // если стоп условия нет:
+            // получить свободные воркеры
+            // если есть - запустить все в цикле
+            // если нет - стать в ожидание SIGCHLD
+              // если стоп-условие есть
+            // если список воркеров пуст  - завершить цикл
+            // если список воркеров не пуст - отправить им SIGSTOP и подождать
         }
     }
 
-    /**
-     * @return WorkerConfig[]
-     */
-    protected function getWorkersList()
+    protected function isTimeLimitReached():bool
     {
-        return $this->instanceConfig->getWorkers();
+        // TODO implement time limit check
+        return false;
     }
 
-    /**
-     * @param WorkerConfig[] ...$workerConfigs
-     * @return WorkerConfig[]
-     */
-    protected function balance(WorkerConfig ...$workerConfigs):array
+    protected function isStopCondition():bool
     {
-
+        $stopCondition = false;
+        if(true === $this->stop){
+            $stopCondition = true;
+        }
+        if($this->isTimeLimitReached()){
+            $stopCondition = true;
+        }
+        return $stopCondition;
     }
 
-    /**
-     * @return ProcessInfo[]
-     */
-    protected function getCurrentProcesses()
-    {
-
-    }
-
-    protected function getFreeWorkers(array $workerConfigs, array $currentWorkers)
-    {
-
-    }
 
     protected function addWorker():int
     {

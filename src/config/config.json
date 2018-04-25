@@ -6,23 +6,23 @@
   "balancer": {
     "maxCpuLoad": 70,
     "maxMemoryLoad": 70,
-    "maxWorkers": 10,
-    "workers": {
-      "newPlayer": {
-        "quantity": 1,
-        "class": "",
-        "priority": 1
-      },
-      "gameStarted": {
-        "quantity": 1,
-        "class": "",
-        "priority": 1
-      },
-      "gameEnded": {
-        "quantity": 1,
-        "class": "",
-        "priority": 1
-      }
+    "maxWorkers": 10
+  },
+  "workers": {
+    "newPlayer": {
+      "quantity": 1,
+      "class": "",
+      "priority": 1
+    },
+    "gameStarted": {
+      "quantity": 1,
+      "class": "",
+      "priority": 1
+    },
+    "gameEnded": {
+      "quantity": 1,
+      "class": "",
+      "priority": 1
     }
   }
 }
