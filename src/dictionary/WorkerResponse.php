@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace duodai\worman\dictionary;
 
-use duodai\amqp\common\ConstantsDictionaryNoReflection;
+
+use duodai\worman\common\ConstantsDictionaryNoReflection;
 
 class WorkerResponse extends ConstantsDictionaryNoReflection
 {

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace duodai\worman\components;
 
 
+use duodai\worman\components\configurator\Configurator;
+use duodai\worman\components\worker\WorkerFactory;
 use duodai\worman\interfaces\BalancerInterface;
 use duodai\worman\interfaces\MasterDaemonFactoryInterface;
 use duodai\worman\interfaces\MasterDaemonInterface;
 use duodai\worman\interfaces\SystemScannerInterface;
+use duodai\worman\interfaces\WorkerFactoryInterface;
 use duodai\worman\interfaces\WorkerLauncherInterface;
 use Psr\Log\LoggerInterface;
 
@@ -56,7 +59,7 @@ class MasterDaemonFactory implements MasterDaemonFactoryInterface
     public function __construct(
         InstanceConfig $instanceConfig,
         Configurator $configurator,
-        WorkerLauncherInterface $workerLauncher,
+        WorkerFactoryInterface $workerFactory,
         BalancerInterface $balancer,
         SystemScannerInterface $systemScanner,
         LoggerInterface $logger

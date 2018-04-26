@@ -14,7 +14,7 @@ use duodai\worman\interfaces\SystemScannerInterface;
 use duodai\worman\interfaces\WorkerLauncherInterface;
 use Psr\Log\LoggerInterface;
 
-class MasterDaemon implements MasterDaemonInterface, ConfigurableInterface
+class MasterDaemon implements MasterDaemonInterface
 {
 
     /**

@@ -7,5 +7,5 @@ namespace duodai\worman\interfaces;
 
 interface WorkerFactoryInterface
 {
-    public function create(string $workerAlias):WorkerInterface;
+    public function create(string $workerAlias):WorkerLauncherInterface;
 }

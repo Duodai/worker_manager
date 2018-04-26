@@ -20,7 +20,7 @@ abstract class ConstantsDictionaryNoReflection
 
     /**
      * @param $value
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     final public function __construct($value)
     {

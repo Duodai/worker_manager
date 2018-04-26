@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace duodai\worman\components\configurator;
 
 use duodai\worman\components\configurator\dto\Config;
+use duodai\worman\components\InstanceConfig;
 use duodai\worman\interfaces\ConfigStorageInterface;
 use duodai\worman\interfaces\ConfigurableInterface;
 
@@ -23,12 +24,12 @@ class Configurator
      * @var ConfigStorageInterface
      */
     protected $storage;
-    protected $instanceId;
-    protected $config;
+    protected $instanceConfig;
 
-    public function __construct(ConfigStorageInterface $storage)
+    public function __construct(InstanceConfig $instanceConfig, ConfigStorageInterface $storage)
     {
         $this->storage = $storage;
+        $this->instanceConfig = $instanceConfig;
     }
 
     public function addConfigurable(ConfigurableInterface $configurable)
@@ -38,8 +39,7 @@ class Configurator
 
     public function refresh()
     {
-        $config = $this->storage->load($this->instanceId);
-        $this->config = $config;
+        $config = $this->storage->load($this->instanceConfig->getInstanceId());
         $this->configure($config);
     }
 
