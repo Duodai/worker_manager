@@ -1,14 +1,14 @@
 <?php
+declare(strict_types=1);
 
-namespace duodai\worman\components;
 
-use duodai\worman\interfaces\SystemScannerInterface;
+namespace duodai\worman\components\statusTracker;
+
 use Linfo\Linfo;
 use Linfo\OS\Linux;
 
-class SystemLoadInfo implements SystemScannerInterface
+class StatusDataSource
 {
-
     /**
      * @var Linux
      */

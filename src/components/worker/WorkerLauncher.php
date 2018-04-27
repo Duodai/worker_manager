@@ -4,38 +4,41 @@ declare(strict_types=1);
 
 namespace duodai\worman\components\worker;
 
-
-use duodai\worman\dto\WorkerResponse;
+use duodai\worman\dictionary\WorkerResponse;
 use duodai\worman\interfaces\WorkerInterface;
+use duodai\worman\interfaces\WorkerLauncherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Class WorkerLauncher
  * @package duodai\worman\worker
  */
-class WorkerLauncher
+class WorkerLauncher implements WorkerLauncherInterface
 {
     /**
      * @var LoggerInterface
      */
     protected $logger;
 
+    protected $worker;
+
     /**
      * WorkerLauncher constructor.
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(WorkerInterface $worker, LoggerInterface $logger)
     {
+        $this->worker = $worker;
         $this->logger = $logger;
     }
 
     /**
-     * @param WorkerInterface $worker
+     *
      */
-    public function run(WorkerInterface $worker)
+    public function run():void
     {
         try{
-            $response = $worker->execute();
+            $response = $this->worker->execute();
         }catch (\Error $e){
             $this->logger->critical($e->getMessage(), [$e->getFile(), $e->getLine(), $e->getTraceAsString()]);
             $response = new WorkerResponse(WorkerResponse::ERROR);
