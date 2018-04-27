@@ -30,8 +30,10 @@ class Config
         return $this->masterDaemonConfig;
     }
 
-    public function toArray()
+    public function toArray():array
     {
-
+        return [
+            //TODO implement this
+        ];
     }
 }
